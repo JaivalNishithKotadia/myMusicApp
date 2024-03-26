@@ -7,11 +7,11 @@
 ---
 
 <p align="center">
-  <img src="./assets/1.jpg" width="30%" />
-  <img src="./assets/2.jpg" width="30%" />
-  <img src="./assets/3.jpg" width="30%" />
+  <img src="./assets/1.png" width="30%" />
+  <img src="./assets/2.png" width="30%" />
+  <img src="./assets/3.png" width="30%" />
 
-  <img src="./assets/4.jpg" width="30%" />
+  <img src="./assets/4.png" width="30%" />
 
 </p>
 
