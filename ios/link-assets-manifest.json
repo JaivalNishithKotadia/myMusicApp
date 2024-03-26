@@ -1,0 +1,53 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/ClashDisplay-Bold.ttf",
+      "sha1": "ad48ac96269d34e5ac4b3149edc0720f118fac06"
+    },
+    {
+      "path": "assets/fonts/ClashDisplay-Extralight.ttf",
+      "sha1": "5c41f3ee91656387612a53a2773450022b9d5b2c"
+    },
+    {
+      "path": "assets/fonts/ClashDisplay-Light.ttf",
+      "sha1": "8690274d9e6e5287f0f34f989c46019d97183196"
+    },
+    {
+      "path": "assets/fonts/ClashDisplay-Medium.ttf",
+      "sha1": "3ab838ddae9140be8d61192e527ac5c526361038"
+    },
+    {
+      "path": "assets/fonts/ClashDisplay-Regular.ttf",
+      "sha1": "18352f4b2de32328e43311a0365af391ded2bc0a"
+    },
+    {
+      "path": "assets/fonts/ClashDisplay-Semibold.ttf",
+      "sha1": "0837f8844612c82b5067d898d3f0619af9aa86fa"
+    },
+    {
+      "path": "assets/fonts/NeueLight.otf",
+      "sha1": "481dcc3cf3626d98c3360eea6bbbc910779a40df"
+    },
+    {
+      "path": "assets/fonts/NeueRegular.otf",
+      "sha1": "51985066187b7a7f67e3403a15e8cd31dbb47027"
+    },
+    {
+      "path": "assets/fonts/NeueUltrabold.otf",
+      "sha1": "e8a4ec6155d8be04502bf221df5367e606afc4ff"
+    },
+    {
+      "path": "assets/fonts/quilla.otf",
+      "sha1": "bf9eaec73555badda7a56bb4595476c9cb0ca250"
+    },
+    {
+      "path": "assets/fonts/shesia.ttf",
+      "sha1": "3042373636f4dbd71116ade1a5a5b939dde70042"
+    },
+    {
+      "path": "assets/fonts/Vandenbroucke.ttf",
+      "sha1": "810c91605c4038d7fcab8b367b8b240808c97cbf"
+    }
+  ]
+}
