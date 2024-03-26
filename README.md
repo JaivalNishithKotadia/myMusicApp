@@ -1,6 +1,5 @@
 <div align="center">
     <img src="./android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="128" height="128" style="display: block; margin: 0 auto"/>
-    
     <h1>myMusic</h1>
     <p>An Android application for streaming music from YouTube Music</p>
 </div>
