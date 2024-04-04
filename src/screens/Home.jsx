@@ -19,7 +19,8 @@ import TrackPlayer, {
   State,
   usePlaybackState,
 } from 'react-native-track-player';
-
+//@ts-ignore
+import Slider from 'react-native-slider';
 import {setupPlayer, addTracks} from '../../trackPlayerServices';
 import RNFS from 'react-native-fs';
 const backBtnSource = require('../../assets/icons/prev-song.png');
@@ -81,6 +82,9 @@ const Home = ({navigation}) => {
   };
   const automaticTrackChange = async () => {
     const infoFromTrack = await TrackPlayer.getActiveTrack();
+    await TrackPlayer.updateNowPlayingMetadata({
+      artwork: infoFromTrack.artwork,
+    });
     setCurrentTrack(infoFromTrack);
   };
   useEffect(() => {
@@ -127,7 +131,9 @@ const Home = ({navigation}) => {
     navigation,
     musicArray,
     index,
+
     url,
+    duration,
   }) => {
     const {palette} = useMaterialYou({});
     const playbackState = usePlaybackState();
@@ -249,21 +255,27 @@ const Home = ({navigation}) => {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={{justifyContent: 'center', padding: 5}}
-            onPress={() => {
-              setshowAlert(true);
+          <View
+            style={{
+              justifyContent: 'center',
+              padding: 5,
             }}>
-            <Image
-              source={dotSource}
-              style={{
-                width: 22,
-                height: 22,
-                resizeMode: 'contain',
-                tintColor: palette.system_accent1[3],
-              }}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => setshowAlert(true)}>
+              <Image
+                source={dotSource}
+                style={{
+                  width: 22,
+                  height: 22,
+                  resizeMode: 'contain',
+
+                  tintColor: palette.system_accent1[3],
+                  alignSelf: 'center',
+                  transform: [{rotate: '90deg'}],
+                }}
+              />
+            </TouchableOpacity>
+            <Text>{duration}</Text>
+          </View>
           <AwesomeAlert
             show={showAlert}
             showProgress={false}
@@ -445,6 +457,7 @@ const Home = ({navigation}) => {
                 navigation={navigation}
                 musicArray={musicArray}
                 index={index}
+                duration={item.duration}
                 url={item.url}
               />
             )}
@@ -631,6 +644,11 @@ const styles = StyleSheet.create({
     height: 100, // Adjust height as needed
     backgroundColor: 'rgba(255, 255, 255, 0.5)', // Adjust the opacity as needed
     zIndex: 11,
+  },
+  sliderContainer: {
+    width: '80%',
+    height: 40,
+    marginTop: 25,
   },
 });
 export default Home;

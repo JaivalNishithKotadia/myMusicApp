@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Image,
   PermissionsAndroid,
+  Dimensions,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import Home from './screens/Home';
@@ -28,7 +29,7 @@ import Music from './screens/Music';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
+const height = Dimensions.get('window');
 const TabNavigator = () => {
   const {palette} = useMaterialYou({});
 
@@ -157,7 +158,12 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        screenOptions={{headerShown: false}}
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'vertical',
+          gestureResponseDistance: height.height / 2,
+        }}
         initialRouteName="Home">
         <Stack.Screen
           name="Tab"

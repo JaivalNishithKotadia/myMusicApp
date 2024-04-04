@@ -55,7 +55,7 @@ export async function playbackService() {
   });
   TrackPlayer.addEventListener(Event.RemoteNext, async () => {
     TrackPlayer.skipToNext();
-    const delay = 300;
+    const delay = 150;
     const timerId = setTimeout(async () => {
       // Your function to be executed after delay
       const currentTrack = await TrackPlayer.getActiveTrack();
@@ -69,7 +69,7 @@ export async function playbackService() {
   });
   TrackPlayer.addEventListener(Event.RemotePrevious, async () => {
     TrackPlayer.skipToPrevious();
-    const delay = 300;
+    const delay = 150;
     const timerId = setTimeout(async () => {
       // Your function to be executed after delay
       const currentTrack = await TrackPlayer.getActiveTrack();

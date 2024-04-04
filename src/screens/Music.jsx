@@ -24,131 +24,6 @@ const backBtnScreen = require('../../assets/icons/back.png');
 const nextBtnSource = require('../../assets/icons/next-song.png');
 const pauseButtonSource = require('../../assets/icons/pause-button.png');
 const playButtonSource = require('../../assets/icons/play-button.png');
-const MusicControl = ({imageColors, artwork}) => {
-  const playBackState = usePlaybackState();
-
-  const nextKeLiye = async () => {
-    const infoFromTrack = await TrackPlayer.getActiveTrack();
-    setInfo(infoFromTrack);
-  };
-  const skipToNext = async () => {
-    await TrackPlayer.skipToNext();
-    const delay = 100;
-    const timerId = setTimeout(() => {
-      // Your function to be executed after delay
-      nextKeLiye();
-    }, delay);
-
-    // Clean up the timer to prevent memory leaks
-    return () => clearTimeout(timerId);
-  };
-  const skipToPrevious = async () => {
-    await TrackPlayer.skipToPrevious();
-  };
-  const togglePlayback = async playback => {
-    const currentTrack = await TrackPlayer.getActiveTrackIndex();
-    await TrackPlayer.updateMetadataForTrack(currentTrack, {
-      artwork: artwork, // URI of your custom artwork
-    });
-    if (currentTrack !== null) {
-      if (playback === State.Paused || playback === State.Ready) {
-        await TrackPlayer.play();
-      } else {
-        await TrackPlayer.pause();
-      }
-    }
-  };
-  if (imageColors !== null) {
-    var btnColor = imageColors;
-  } else {
-    var btnColor = '#ffffff';
-  }
-  const newShade = (hexColor, magnitude) => {
-    hexColor = hexColor.replace(`#`, ``);
-    if (hexColor.length === 6) {
-      const decimalColor = parseInt(hexColor, 16);
-      let r = (decimalColor >> 16) + magnitude;
-      r > 255 && (r = 255);
-      r < 0 && (r = 0);
-      let g = (decimalColor & 0x0000ff) + magnitude;
-      g > 255 && (g = 255);
-      g < 0 && (g = 0);
-      let b = ((decimalColor >> 8) & 0x00ff) + magnitude;
-      b > 255 && (b = 255);
-      b < 0 && (b = 0);
-      return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
-    } else {
-      return hexColor;
-    }
-  };
-  const darkerColorForBtn = newShade(btnColor, -60);
-
-  return (
-    <LinearGradient
-      colors={['#111111', '#111111']}
-      style={[
-        {
-          width: '85%',
-          marginTop: 50,
-          height: '35%',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-          borderRadius: 35,
-          flexDirection: 'row',
-        },
-      ]}>
-      <TouchableOpacity onPress={skipToPrevious}>
-        <View style={styles.btnContainer}>
-          <Image
-            source={backBtnSource}
-            style={{width: 26, height: 26, tintColor: '#dbdbdb'}}
-          />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => togglePlayback(playBackState.state)}>
-        <LinearGradient
-          colors={[btnColor, darkerColorForBtn]}
-          style={{
-            width: 66,
-            height: 66,
-            borderRadius: 33,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={
-              playBackState.state === State.Playing
-                ? pauseButtonSource
-                : playButtonSource
-            }
-            style={
-              playBackState.state === State.Playing
-                ? {
-                    width: 30,
-                    height: 30,
-                    tintColor: '#1c1c1c',
-                  }
-                : {
-                    width: 27,
-                    height: 27,
-                    tintColor: '#1c1c1c',
-                    marginLeft: 4,
-                  }
-            }
-          />
-        </LinearGradient>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={skipToNext}>
-        <View style={styles.btnContainer}>
-          <Image
-            source={nextBtnSource}
-            style={{width: 26, height: 26, tintColor: '#dbdbdb'}}
-          />
-        </View>
-      </TouchableOpacity>
-    </LinearGradient>
-  );
-};
 
 const device = Dimensions.get('screen');
 const Music = ({route, navigation}) => {
@@ -324,7 +199,7 @@ const Music = ({route, navigation}) => {
     if (info.length !== 0) {
       getColors(info.artwork)
         .then(colors => {
-          const lighterColor = newShade(colors.dominant, 100);
+          const lighterColor = newShade(colors.average, 100);
 
           setImageColors(lighterColor);
         })

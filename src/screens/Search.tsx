@@ -8,7 +8,9 @@ import {
   Image,
   FlatList,
   Keyboard,
+  Dimensions,
 } from 'react-native';
+import YTMusic from 'ytmusic-api';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import {storeMusicData, getMusicData} from '../../MusicDataStorage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -21,6 +23,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import RNFS from 'react-native-fs';
 import RNRestart from 'react-native-restart';
 import {usePlaybackState} from 'react-native-track-player';
+const dimensions = Dimensions.get('window');
 
 const SearchResultItem = ({
   id,
@@ -30,6 +33,8 @@ const SearchResultItem = ({
   darkerColor,
   navigation,
   musicDataForTrackPlayer,
+  duration,
+  isSong,
 }: any) => {
   const {palette} = useMaterialYou({});
   function sanitizeFilename(filename: any) {
@@ -65,13 +70,18 @@ const SearchResultItem = ({
   } else {
     titleText = title;
   }
-  const highImgSource = imgSource.replace(/120/g, '544');
+  if (isSong) {
+    var highImgSource = imgSource.replace(/120/g, '544');
+  } else {
+    var highImgSource = imgSource;
+  }
 
   const handleButtonPress = async (
     id: any,
     title: any,
     imgSource: any,
     artist: any,
+    duration: any,
   ) => {
     console.log('Pressed!');
     const fetch = require('node-fetch');
@@ -104,6 +114,7 @@ const SearchResultItem = ({
             title: title,
             artist: artistText,
             id: Math.floor(Math.random() * 90000) + 10000,
+            duration: duration,
           };
 
           storeMusicData(musicData);
@@ -114,13 +125,18 @@ const SearchResultItem = ({
         .catch(err => {
           console.log('Download error:', err);
         });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      Alert.alert('Error', error.toString(), [], {
+        cancelable: false,
+      });
     }
   };
   return (
     <TouchableOpacity
-      onPress={() => handleButtonPress(id, title, imgSource, artistText)}>
+      onPress={() =>
+        handleButtonPress(id, title, imgSource, artistText, duration)
+      }>
       <View
         style={{
           flexDirection: 'row',
@@ -162,18 +178,13 @@ const SearchResultItem = ({
             </Text>
           </View>
         </View>
-
-        <TouchableOpacity style={{justifyContent: 'center', padding: 5}}>
-          <Image
-            source={dotSource}
-            style={{
-              width: 22,
-              height: 22,
-              resizeMode: 'contain',
-              tintColor: palette.system_accent1[3],
-            }}
-          />
-        </TouchableOpacity>
+        <View
+          style={{
+            justifyContent: 'center',
+            padding: 5,
+          }}>
+          <Text style={{fontFamily: 'ClashDisplay-Regular'}}>{duration}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -218,9 +229,14 @@ const Search = ({navigation}: any) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [searchBtnPressed, setSearchBtnPressed] = React.useState(false);
   const [showAlert, setshowAlert] = React.useState(false);
-  const [searchResult, setSearchResult] = React.useState(null);
+  const [searchResultForSongs, setSearchResultForSongs] = React.useState(null);
+  const [searchResultForVids, setSearchResultForVids] = React.useState(null);
+  const [toShowSearchResult, setToShowSearchResult] = React.useState(false);
+  const [whatToShow, setWhatToShow] = React.useState('songs');
   const handleSearchBtnPressed = async () => {
     Keyboard.dismiss();
+    const ytmusic = new YTMusic();
+    await ytmusic.initialize();
     if (searchQuery.length > 0) {
       const fetch = require('node-fetch');
 
@@ -240,8 +256,17 @@ const Search = ({navigation}: any) => {
       try {
         const response = await fetch(url, options);
         const result = await response.text();
+
+        await ytmusic.search(searchQuery).then(async (songs: any) => {
+          let newArray = songs.filter(function (el: any) {
+            return el.type === 'VIDEO' || el.type === 'SONG';
+          });
+          console.log(newArray);
+          setSearchResultForVids(newArray);
+        });
         const obj = JSON.parse(result);
-        setSearchResult(obj.result);
+        setToShowSearchResult(true);
+        setSearchResultForSongs(obj.result);
       } catch (error) {
         console.error(error);
       }
@@ -296,7 +321,11 @@ const Search = ({navigation}: any) => {
             iconColor="#ffffff"
             placeholderTextColor={'#ffffff'}
             cursorColor={primary40}
-            onClearIconPress={() => setSearchResult(null)}
+            onClearIconPress={() => {
+              setSearchResultForSongs(null);
+              setToShowSearchResult(false);
+              setSearchResultForVids(null);
+            }}
           />
           <TouchableOpacity
             style={{justifyContent: 'center'}}
@@ -374,26 +403,95 @@ const Search = ({navigation}: any) => {
             }}
           />
         </View>
-        {searchResult !== null ? (
-          <FlatList
-            data={searchResult}
-            renderItem={({item}) => (
-              <SearchResultItem
-                title={item.title}
-                id={item.videoId}
-                imgSource={item.thumbnail}
-                artist={item.author}
-                darkerColor={darkerColor}
-                navigation={navigation}
-                musicDataForTrackPlayer={musicDataForTrackPlayer}
+        {toShowSearchResult !== false ? (
+          <View>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+              <TouchableOpacity
+                style={[
+                  stylesForSelectable(lighterColor).selectableBtn,
+                  {
+                    backgroundColor:
+                      whatToShow === 'songs' ? lighterColor : darkerColor,
+                  },
+                ]}
+                onPress={() => {
+                  whatToShow !== 'songs'
+                    ? setWhatToShow('songs')
+                    : console.log('not working');
+                }}>
+                <Text
+                  style={{color: 'white', fontFamily: 'ClashDisplay-Regular'}}>
+                  Songs
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  stylesForSelectable(lighterColor).selectableBtn,
+                  {
+                    backgroundColor:
+                      whatToShow === 'videos' ? lighterColor : darkerColor,
+                  },
+                ]}
+                onPress={() => {
+                  whatToShow !== 'videos'
+                    ? setWhatToShow('videos')
+                    : console.log('not working');
+                }}>
+                <Text
+                  style={{color: 'white', fontFamily: 'ClashDisplay-Regular'}}>
+                  Videos
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {whatToShow === 'songs' ? (
+              <FlatList
+                data={searchResultForSongs}
+                renderItem={({item}) => (
+                  <SearchResultItem
+                    title={item.title}
+                    id={item.videoId}
+                    isSong={true}
+                    imgSource={item.thumbnail}
+                    artist={item.author}
+                    darkerColor={darkerColor}
+                    navigation={navigation}
+                    musicDataForTrackPlayer={musicDataForTrackPlayer}
+                    duration={item.duration}
+                  />
+                )}
+                keyExtractor={item => item.videoId.toString()}
+                style={{marginTop: 7}}
+                showsVerticalScrollIndicator={false}
+                fadingEdgeLength={200}
+                contentContainerStyle={{paddingBottom: 320}}
+              />
+            ) : (
+              <FlatList
+                data={searchResultForVids}
+                renderItem={({item}) => (
+                  <SearchResultItem
+                    title={item.name}
+                    id={item.videoId}
+                    isSong={false}
+                    imgSource={item.thumbnails[item.thumbnails.length - 1].url}
+                    artist={item.artist.name}
+                    darkerColor={darkerColor}
+                    navigation={navigation}
+                    musicDataForTrackPlayer={musicDataForTrackPlayer}
+                    duration={new Date(item.duration * 1000)
+                      .toISOString()
+                      .substring(15, 19)}
+                  />
+                )}
+                keyExtractor={(item, index) => item.videoId}
+                style={{marginTop: 7}}
+                showsVerticalScrollIndicator={false}
+                fadingEdgeLength={200}
+                contentContainerStyle={{paddingBottom: 320}}
               />
             )}
-            keyExtractor={item => item.videoId.toString()}
-            style={{marginTop: 7}}
-            showsVerticalScrollIndicator={false}
-            fadingEdgeLength={200}
-            contentContainerStyle={{paddingBottom: 120}}
-          />
+          </View>
         ) : (
           <View
             style={{
@@ -419,4 +517,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+const stylesForSelectable = (lighterColor: any) =>
+  StyleSheet.create({
+    selectableBtn: {
+      padding: 10,
+      marginTop: 15,
+      borderRadius: 20,
+      width: dimensions.width / 5,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });
 export default Search;
