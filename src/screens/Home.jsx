@@ -274,7 +274,7 @@ const Home = ({navigation}) => {
                 }}
               />
             </TouchableOpacity>
-            <Text>{duration}</Text>
+            <Text style={{fontFamily: 'ClashDisplay-Regular'}}>{duration}</Text>
           </View>
           <AwesomeAlert
             show={showAlert}
